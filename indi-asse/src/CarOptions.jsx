@@ -1,17 +1,34 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 function CarOptions() {
+  const location = useLocation();
+  const urlData = location.state;
+  const [from, setfrom] = useState();
+  const [to, setto] = useState();
+  
+  
   
   const [carData, setCarData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState("https://indirides.com/city-to-city/mumbai/kolkata");
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCarData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/scrape?url=${encodeURIComponent(url)}`);
+        const parsedUrl = new URL(urlData);
+        const pathSegments = parsedUrl.pathname.split("/").filter(Boolean);
+        const source = pathSegments[1];       
+        const destination = pathSegments[2];
+        console.log(pathSegments);
+        const finalurl = `https://indirides.com/city-to-city/${source}/${destination}`;
+        setfrom(source);
+        setto(destination);
+        const response = await fetch(`http://localhost:5000/api/scrape?url=${encodeURIComponent(finalurl)}`);
         const data = await response.json();
+        console.log(data);
+        console.log(source);
+        console.log(destination);
         setCarData(data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -22,7 +39,7 @@ function CarOptions() {
     };
 
     fetchCarData();
-  }, [url]);
+  }, []);
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -33,7 +50,7 @@ function CarOptions() {
     <div className="container">
       
       <div className="box">
-      <h className= "heading">From to</h>
+      <h1 className= "heading"> From {from} to {to} </h1>
         <h2 className="heading">Available Car Options</h2>
 
         <div className="trip-info">

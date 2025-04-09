@@ -1,4 +1,3 @@
-// server/scrape.js
 const puppeteer = require("puppeteer");
 
 async function scrapeCarOptions(url) {
@@ -6,7 +5,6 @@ async function scrapeCarOptions(url) {
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: "networkidle0" });
 
-  // Get general trip info
   const generalInfo = await page.evaluate(() => {
     const getText = (selector, index = 0) => {
       const elements = document.querySelectorAll(selector);
@@ -20,13 +18,12 @@ async function scrapeCarOptions(url) {
     };
   });
 
-  // Car tabs scraping
   const tabButtons = await page.$$('[role="tab"]');
   const carDetails = {};
 
   for (let i = 0; i < tabButtons.length; i++) {
     await tabButtons[i].click();
-    await new Promise((res) => setTimeout(res, 500)); // Small delay
+    await new Promise((res) => setTimeout(res, 500)); 
 
     const carData = await page.evaluate(() => {
       const activePanel = document.querySelector('[role="tabpanel"]:not([hidden])');
